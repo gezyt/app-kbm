@@ -8,6 +8,7 @@ import {
   type ResourceCategory,
 } from "../services/resource.service";
 import { Layout } from "../components/Layout";
+import { logForUser } from "../services/activity-log.service";
 
 type AppContext = {
   Variables: { user: SessionUser };
@@ -143,6 +144,11 @@ resourcesRoutes.post("/app/resources", async (c) => {
 
   if (RESOURCE_CATEGORIES.includes(category) && title && url) {
     await createResource(user.id, { category, title, url, description });
+    await logForUser(
+      user,
+      "buat_perangkat",
+      `Menambah perangkat ${title} (kategori ${category})`,
+    );
   }
 
   return c.redirect("/app/resources");
@@ -151,6 +157,12 @@ resourcesRoutes.post("/app/resources", async (c) => {
 resourcesRoutes.delete("/app/resources/:id", async (c) => {
   const user = c.get("user");
   const id = Number(c.req.param("id"));
+  const target = (await listResourcesByUser(user.id)).find((r) => r.id === id);
   await deleteResource(user.id, id);
+  await logForUser(
+    user,
+    "hapus_perangkat",
+    `Menghapus perangkat ${target?.title ?? `ID ${id}`}`,
+  );
   return c.body(null);
 });

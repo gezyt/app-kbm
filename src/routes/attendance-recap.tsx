@@ -5,6 +5,7 @@ import { Layout } from "../components/Layout";
 import { AttendanceTabs } from "../components/AttendanceTabs";
 import { todayIso } from "../utils/dates";
 import { toCsv } from "../utils/csv";
+import { logForUser } from "../services/activity-log.service";
 
 type AppContext = {
   Variables: { user: SessionUser };
@@ -164,6 +165,11 @@ attendanceRecapRoutes.get("/app/attendance/recap/export.csv", async (c) => {
     }
   }
 
+  await logForUser(
+    user,
+    "ekspor_rekap_absensi_csv",
+    `Mengekspor rekap absensi (${start} s.d. ${end})`,
+  );
   const csv = "\uFEFF" + toCsv(headers, rows); // BOM agar Excel membaca UTF-8
   c.header("Content-Type", "text/csv; charset=utf-8");
   c.header(

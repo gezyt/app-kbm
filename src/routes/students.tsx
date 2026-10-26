@@ -24,6 +24,7 @@ import {
   getActivationBatch,
 } from "../services/activation-batch.store";
 import { toCsv } from "../utils/csv";
+import { logForUser } from "../services/activity-log.service";
 import { Layout } from "../components/Layout";
 import { Alert } from "../components/Alert";
 
@@ -101,6 +102,7 @@ studentsRoutes.post("/app/students", async (c) => {
 
   if (name) {
     await createClass(user.id, { name });
+    await logForUser(user, "buat_kelas", `Menambah kelas ${name}`);
   }
 
   return c.redirect("/app/students");
@@ -108,7 +110,13 @@ studentsRoutes.post("/app/students", async (c) => {
 
 studentsRoutes.delete("/app/students/:classId", async (c) => {
   const classId = Number(c.req.param("classId"));
+  const klass = await getClassById(classId);
   await deleteClass(classId);
+  await logForUser(
+    c.get("user"),
+    "hapus_kelas",
+    `Menghapus kelas ${klass?.name ?? `ID ${classId}`}`,
+  );
   c.header("HX-Redirect", "/app/students");
   return c.body(null);
 });
@@ -474,6 +482,12 @@ studentsRoutes.post(
       );
     }
 
+    // Sengaja tidak mencatat loginId/PIN: kredensial tidak masuk log.
+    await logForUser(
+      user,
+      "aktivasi_login_siswa",
+      `Mengaktifkan login siswa ${target.name} (kelas ${klass.name})`,
+    );
     const exportToken = createActivationBatch(classId, [
       { name: target.name, loginId: result.loginId, pin: result.pin },
     ]);
@@ -503,7 +517,15 @@ studentsRoutes.post(
     const klass = await getClassById(classId);
     if (!klass) return c.redirect("/app/students");
 
+    const target = (await listStudentsByClass(classId)).find(
+      (s) => s.id === studentId,
+    );
     await disableStudentLogin(studentId);
+    await logForUser(
+      user,
+      "nonaktifkan_login_siswa",
+      `Menonaktifkan login siswa ${target?.name ?? `ID ${studentId}`} (kelas ${klass.name})`,
+    );
 
     return c.redirect(`/app/students/${classId}`);
   },
@@ -520,6 +542,12 @@ studentsRoutes.post("/app/students/:classId/activate-all", async (c) => {
     students.map((s) => ({ id: s.id, name: s.name })),
   );
 
+  // Sengaja tidak mencatat loginId/PIN: kredensial tidak masuk log.
+  await logForUser(
+    user,
+    "aktivasi_login_siswa_massal",
+    `Mengaktifkan login ${result.activated.length} siswa (kelas ${klass.name})`,
+  );
   const exportToken =
     result.activated.length > 0
       ? createActivationBatch(
@@ -565,6 +593,12 @@ studentsRoutes.get("/app/students/:classId/export-logins.csv", async (c) => {
     );
   }
 
+  // Hanya jumlah baris yang dicatat; isi PIN tidak masuk log.
+  await logForUser(
+    user,
+    "ekspor_login_siswa_csv",
+    `Mengekspor login siswa kelas ${klass.name} (${rows.length} baris)`,
+  );
   const csv = toCsv(
     ["nama", "nis", "pin"],
     rows.map((r) => [r.name, r.loginId, r.pin]),
@@ -592,6 +626,11 @@ studentsRoutes.post("/app/students/:classId", async (c) => {
 
   if (name) {
     await createStudent(classId, { nis, name, gender });
+    await logForUser(
+      user,
+      "buat_siswa",
+      `Menambah siswa ${name} (kelas ${klass.name})`,
+    );
   }
 
   return c.redirect(`/app/students/${classId}`);
@@ -614,6 +653,11 @@ studentsRoutes.post("/app/students/:classId/import", async (c) => {
     importResult = { imported: 0, skipped: 0, errors: ["File tidak valid."] };
   }
 
+  await logForUser(
+    user,
+    "impor_siswa_csv",
+    `Mengimpor siswa dari CSV ke kelas ${klass.name} (${importResult.imported} berhasil, ${importResult.skipped} dilewati)`,
+  );
   const students = await listStudentsByClass(classId);
   return c.html(
     <ClassDetailPage
@@ -632,7 +676,15 @@ studentsRoutes.delete("/app/students/:classId/:studentId", async (c) => {
   const klass = await getClassById(classId);
 
   if (klass) {
+    const target = (await listStudentsByClass(classId)).find(
+      (s) => s.id === studentId,
+    );
     await deleteStudent(classId, studentId);
+    await logForUser(
+      c.get("user"),
+      "hapus_siswa",
+      `Menghapus siswa ${target?.name ?? `ID ${studentId}`} (kelas ${klass.name})`,
+    );
   }
 
   return c.body(null);
@@ -652,6 +704,11 @@ studentsRoutes.post("/app/students/:classId/bulk-delete", async (c) => {
 
   if (ids.length > 0) {
     await deleteStudents(classId, ids);
+    await logForUser(
+      user,
+      "hapus_siswa_massal",
+      `Menghapus ${ids.length} siswa (kelas ${klass.name})`,
+    );
   }
 
   return c.redirect(`/app/students/${classId}`);

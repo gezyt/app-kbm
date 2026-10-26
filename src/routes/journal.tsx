@@ -7,7 +7,11 @@ import {
   normalizeJournalSubject,
   updateJournal,
 } from "../services/journal.service";
-import { listSchedulesByUserAndDay } from "../services/schedule.service";
+import {
+  getScheduleForUser,
+  listSchedulesByUserAndDay,
+} from "../services/schedule.service";
+import { logForUser } from "../services/activity-log.service";
 import { Layout } from "../components/Layout";
 import { JournalTabs } from "../components/JournalTabs";
 import { dayOfWeekFromIso, formatDateLabel, todayIso } from "../utils/dates";
@@ -140,6 +144,14 @@ journalRoutes.post("/app/journal", async (c) => {
   const journal = await getOrCreateDraftJournal(user.id, scheduleId, date);
   if (!journal) return c.redirect("/app/journal");
 
+  const schedule = await getScheduleForUser(user.id, scheduleId);
+  await logForUser(
+    user,
+    "buat_jurnal",
+    schedule
+      ? `Membuat jurnal ${schedule.subject} · ${schedule.class.name} (${date})`
+      : `Membuat jurnal (tanggal ${date})`,
+  );
   return c.redirect(`/app/journal/${journal.id}`);
 });
 
@@ -270,5 +282,10 @@ journalRoutes.post("/app/journal/:id{[0-9]+}", async (c) => {
     status,
   });
 
+  await logForUser(
+    user,
+    "simpan_jurnal",
+    `Menyimpan jurnal ${journal.schedule.subject} · ${journal.schedule.class.name} (${journal.date}, ${status === "completed" ? "selesai" : "draf"})`,
+  );
   return c.redirect(`/app/journal?date=${encodeURIComponent(journal.date)}`);
 });

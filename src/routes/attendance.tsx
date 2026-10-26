@@ -12,6 +12,7 @@ import {
   listSchedulesByUser,
 } from "../services/schedule.service";
 import { Layout } from "../components/Layout";
+import { logForUser } from "../services/activity-log.service";
 import { AttendanceTabs } from "../components/AttendanceTabs";
 import { DAY_NAMES, dayOfWeekFromIso, todayIso, formatDateLabel } from "../utils/dates";
 
@@ -515,6 +516,11 @@ attendanceRoutes.post("/app/attendance", async (c) => {
   }
 
   await saveAttendance(scheduleId, date, entries);
+  await logForUser(
+    user,
+    "simpan_absensi",
+    `Menyimpan absensi ${schedule.subject} · ${schedule.class.name} (${date}, ${entries.length} siswa)`,
+  );
 
   return c.redirect(`/app/attendance?scheduleId=${scheduleId}&date=${date}`);
 });
@@ -529,6 +535,11 @@ attendanceRoutes.post("/app/attendance/delete", async (c) => {
   if (!schedule) return c.redirect("/app/attendance");
 
   await deleteAttendanceForScheduleDate(scheduleId, date);
+  await logForUser(
+    user,
+    "hapus_absensi",
+    `Menghapus absensi ${schedule.subject} · ${schedule.class.name} (${date})`,
+  );
 
   return c.redirect(`/app/attendance?scheduleId=${scheduleId}&date=${date}`);
 });

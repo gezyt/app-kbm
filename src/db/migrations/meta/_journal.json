@@ -64,6 +64,13 @@
       "when": 1788401730444,
       "tag": "0008_school_profile_and_user_nip",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1792996610806,
+      "tag": "0009_activity_logs",
+      "breakpoints": true
     }
   ]
 }

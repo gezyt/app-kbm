@@ -4,6 +4,7 @@ import { FormInput } from "../components/FormInput";
 import { Layout } from "../components/Layout";
 import type { SessionUser } from "../services/auth.service";
 import { changePassword } from "../services/auth.service";
+import { logForUser } from "../services/activity-log.service";
 
 type AppContext = {
   Variables: { user: SessionUser };
@@ -48,10 +49,17 @@ function ProfilePage({
               Atur identitas sekolah, kepala sekolah, dan default laporan
             </p>
           </a>
-          <a href="/app/admin/users" class="gt-card gt-card-hover block p-4 mb-4">
+          <a href="/app/admin/users" class="gt-card gt-card-hover block p-4 mb-3">
             <p class="font-medium">⚙️ Kelola User</p>
             <p class="gt-muted text-sm">
               Tambah, edit, atau hapus akun guru lain
+            </p>
+          </a>
+          <a href="/app/admin/logs" class="gt-card gt-card-hover block p-4 mb-4">
+            <p class="font-medium">📜 Log Aktivitas</p>
+            <p class="gt-muted text-sm">
+              Seluruh aktivitas guru & admin: login, jadwal, jurnal, absensi,
+              nilai, dan kelola data
             </p>
           </a>
         </>
@@ -132,5 +140,6 @@ profileRoutes.post("/app/profile/password", async (c) => {
     return c.html(<ProfilePage user={user} error={result.error} />, 400);
   }
 
+  await logForUser(user, "ubah_password_sendiri", "Mengubah password sendiri");
   return c.html(<ProfilePage user={user} success />);
 });

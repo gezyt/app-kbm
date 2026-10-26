@@ -1,11 +1,16 @@
 import { Hono } from "hono";
 import type { SessionUser } from "../services/auth.service";
-import { listClassesWithStudentCount } from "../services/class.service";
+import {
+  getClassById,
+  listClassesWithStudentCount,
+} from "../services/class.service";
 import {
   createSchedule,
   deleteSchedule,
+  getScheduleForUser,
   listSchedulesByUser,
 } from "../services/schedule.service";
+import { logForUser } from "../services/activity-log.service";
 import { Layout } from "../components/Layout";
 import { DAY_NAMES } from "../utils/dates";
 
@@ -184,6 +189,12 @@ scheduleRoutes.post("/app/schedule", async (c) => {
       endTime,
       room,
     });
+    const klass = await getClassById(classId);
+    await logForUser(
+      user,
+      "buat_jadwal",
+      `Menambah jadwal ${subject} (kelas ${klass?.name ?? `ID ${classId}`}, ${DAY_NAMES[dayOfWeek]} ${startTime}–${endTime})`,
+    );
   }
 
   return c.redirect("/app/schedule");
@@ -192,6 +203,14 @@ scheduleRoutes.post("/app/schedule", async (c) => {
 scheduleRoutes.delete("/app/schedule/:id", async (c) => {
   const user = c.get("user");
   const id = Number(c.req.param("id"));
+  const schedule = await getScheduleForUser(user.id, id);
   await deleteSchedule(user.id, id);
+  await logForUser(
+    user,
+    "hapus_jadwal",
+    schedule
+      ? `Menghapus jadwal ${schedule.subject} (kelas ${schedule.class.name})`
+      : `Menghapus jadwal ID ${id}`,
+  );
   return c.body(null);
 });

@@ -1,6 +1,10 @@
 import { Hono } from "hono";
 import type { SessionUser } from "../services/auth.service";
-import { listClassesWithStudentCount } from "../services/class.service";
+import {
+  getClassById,
+  listClassesWithStudentCount,
+} from "../services/class.service";
+import { logForUser } from "../services/activity-log.service";
 import {
   createAssessmentPlan,
   deleteAssessmentPlan,
@@ -215,6 +219,12 @@ scoresRoutes.post("/app/scores/plans", async (c) => {
 
   if (classId && subject && name && !Number.isNaN(weight)) {
     await createAssessmentPlan({ classId, subject, name, weight });
+    const klass = await getClassById(classId);
+    await logForUser(
+      c.get("user"),
+      "buat_rencana_nilai",
+      `Menambah rencana nilai ${name} (bobot ${weight}, kelas ${klass?.name ?? `ID ${classId}`}, mapel ${subject})`,
+    );
   }
 
   return c.redirect(
@@ -227,6 +237,12 @@ scoresRoutes.delete("/app/scores/plans/:id", async (c) => {
   const classId = c.req.query("classId");
   const subject = c.req.query("subject");
   await deleteAssessmentPlan(id);
+  const klass = classId ? await getClassById(Number(classId)) : undefined;
+  await logForUser(
+    c.get("user"),
+    "hapus_rencana_nilai",
+    `Menghapus rencana nilai ID ${id} (kelas ${klass?.name ?? classId ?? "-"}, mapel ${subject ?? "-"})`,
+  );
   c.header(
     "HX-Redirect",
     `/app/scores?classId=${classId}&subject=${encodeURIComponent(subject ?? "")}`,
@@ -239,6 +255,7 @@ scoresRoutes.post("/app/scores/entry", async (c) => {
   const subject = String(c.req.query("subject") ?? "");
   const body = await c.req.parseBody();
 
+  let savedCount = 0;
   for (const [key, value] of Object.entries(body)) {
     if (!key.startsWith("score_")) continue;
     const [, studentIdStr, planIdStr] = key.split("_");
@@ -253,8 +270,16 @@ scoresRoutes.post("/app/scores/entry", async (c) => {
       (numericValue === null || !Number.isNaN(numericValue))
     ) {
       await upsertScore(studentId, assessmentPlanId, numericValue);
+      savedCount++;
     }
   }
+
+  const klass = await getClassById(classId);
+  await logForUser(
+    c.get("user"),
+    "simpan_nilai",
+    `Menyimpan ${savedCount} nilai (kelas ${klass?.name ?? `ID ${classId}`}, mapel ${subject})`,
+  );
 
   return c.redirect(
     `/app/scores?classId=${classId}&subject=${encodeURIComponent(subject)}`,

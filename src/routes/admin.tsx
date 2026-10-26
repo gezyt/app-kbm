@@ -5,10 +5,12 @@ import type { SessionUser, UserRole } from "../services/auth.service";
 import {
   createUser,
   deleteUser,
+  getUserById,
   listUsers,
   resetPassword,
   updateUser,
 } from "../services/user.service";
+import { logForUser } from "../services/activity-log.service";
 
 type AppContext = {
   Variables: { user: SessionUser };
@@ -215,6 +217,11 @@ adminRoutes.post("/app/admin/users", async (c) => {
     return c.redirect(`/app/admin/users?error=${result.error}`);
   }
 
+  await logForUser(
+    c.get("user"),
+    "buat_user",
+    `Menambah pengguna ${name} (${email}, peran ${role})`,
+  );
   return c.redirect("/app/admin/users?success=User berhasil ditambahkan.");
 });
 
@@ -234,6 +241,11 @@ adminRoutes.post("/app/admin/users/:id", async (c) => {
     return c.redirect(`/app/admin/users?error=${result.error}`);
   }
 
+  await logForUser(
+    c.get("user"),
+    "ubah_user",
+    `Mengubah pengguna ${name} (${email}, peran ${role})`,
+  );
   return c.redirect("/app/admin/users?success=User berhasil diperbarui.");
 });
 
@@ -248,6 +260,12 @@ adminRoutes.post("/app/admin/users/:id/reset-password", async (c) => {
     return c.redirect(`/app/admin/users?error=${result.error}`);
   }
 
+  const target = await getUserById(id);
+  await logForUser(
+    c.get("user"),
+    "reset_password_user",
+    `Mereset password pengguna ${target?.name ?? `ID ${id}`}`,
+  );
   return c.redirect("/app/admin/users?success=Password berhasil direset.");
 });
 
@@ -260,7 +278,16 @@ adminRoutes.delete("/app/admin/users/:id", async (c) => {
     return c.body(null);
   }
 
+  const target = await getUserById(id);
   const result = await deleteUser(id);
+
+  if (result.ok) {
+    await logForUser(
+      currentUser,
+      "hapus_user",
+      `Menghapus pengguna ${target?.name ?? `ID ${id}`}`,
+    );
+  }
 
   c.header(
     "HX-Redirect",

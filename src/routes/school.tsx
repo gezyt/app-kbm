@@ -6,6 +6,7 @@ import {
   getSchoolProfile,
   updateSchoolProfile,
 } from "../services/school.service";
+import { logForUser } from "../services/activity-log.service";
 
 type AppContext = {
   Variables: { user: SessionUser };
@@ -155,6 +156,11 @@ schoolRoutes.post("/app/admin/school", async (c) => {
     defaultSemester: body.defaultSemester === "2" ? "2" : "1",
   });
 
+  await logForUser(
+    c.get("user"),
+    "ubah_profil_sekolah",
+    `Mengubah profil sekolah menjadi ${schoolName}`,
+  );
   return c.redirect("/app/admin/school?success=1");
 });
 

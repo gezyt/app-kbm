@@ -30,6 +30,32 @@ export const users = sqliteTable("users", {
   ...timestamps,
 });
 
+/**
+ * Log aktivitas guru & admin (bukan siswa).
+ * `userName`/`userRole` adalah snapshot saat kejadian, supaya baris log tetap
+ * terbaca meski akunnya diubah/dihapus nanti (`userId` jadi null saat hapus).
+ * TIDAK PERNAH menyimpan kata sandi, PIN, token, atau isi kredensial lain.
+ * Pencatatan bersifat anti-gagal di service-nya: gagal mencatat tidak boleh
+ * menggagalkan aksi utama pengguna.
+ */
+export const activityLogs = sqliteTable(
+  "activity_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    userName: text("user_name").notNull(),
+    userRole: text("user_role"),
+    action: text("action").notNull(),
+    detail: text("detail").notNull(),
+    createdAt: integer("created_at")
+      .notNull()
+      .default(sql`(unixepoch('now') * 1000)`),
+  },
+  (table) => [index("activity_logs_created_idx").on(table.createdAt)],
+);
+
 /** Identitas sekolah dan default metadata laporan, satu profil per instalasi. */
 export const schoolProfiles = sqliteTable("school_profiles", {
   id: integer("id").primaryKey(),

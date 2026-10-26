@@ -7,8 +7,10 @@ import { SESSION_COOKIE } from "../middleware/auth";
 import {
   createSession,
   destroySession,
+  getSessionUser,
   verifyCredentials,
 } from "../services/auth.service";
+import { logActivity, logForUser } from "../services/activity-log.service";
 
 export const authRoutes = new Hono();
 
@@ -49,6 +51,13 @@ authRoutes.post("/login", async (c) => {
   const user = await verifyCredentials(email, password);
 
   if (!user) {
+    await logActivity({
+      userId: null,
+      userName: email || "(email kosong)",
+      userRole: null,
+      action: "login_gagal",
+      detail: `Gagal masuk dengan email ${email || "(email kosong)"}`,
+    });
     return c.html(
       <Layout title="Masuk">
         <div class="gt-card w-full max-w-sm shadow-sm p-6">
@@ -84,6 +93,14 @@ authRoutes.post("/login", async (c) => {
 
   const session = await createSession(user.id);
 
+  await logActivity({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    action: "login",
+    detail: "Masuk ke aplikasi",
+  });
+
   setCookie(c, SESSION_COOKIE, session.id, {
     httpOnly: true,
     sameSite: "Lax",
@@ -97,7 +114,11 @@ authRoutes.post("/login", async (c) => {
 
 authRoutes.post("/logout", async (c) => {
   const sessionId = getCookie(c, SESSION_COOKIE);
+  const actor = await getSessionUser(sessionId);
   await destroySession(sessionId);
+  if (actor) {
+    await logForUser(actor, "logout", "Keluar dari aplikasi");
+  }
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
   return c.redirect("/login");
 });
