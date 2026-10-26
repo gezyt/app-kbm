@@ -15,10 +15,17 @@ import { logActivity, logForUser } from "../services/activity-log.service";
 export const authRoutes = new Hono();
 
 authRoutes.get("/login", (c) => {
+  const restored = c.req.query("restored") === "1";
   return c.html(
     <Layout title="Masuk">
       <div class="gt-card w-full max-w-sm shadow-sm p-6">
         <h1 class="gt-accent-text text-xl font-semibold mb-1">GezyTeach</h1>
+        {restored && (
+          <Alert variant="success">
+            Data berhasil dipulihkan. Silakan masuk dengan akun dari berkas
+            backup.
+          </Alert>
+        )}
         <p class="gt-muted text-sm mb-6">Masuk untuk mengelola kelas Anda</p>
         <form method="post" action="/login">
           <FormInput

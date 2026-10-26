@@ -55,11 +55,18 @@ function ProfilePage({
               Tambah, edit, atau hapus akun guru lain
             </p>
           </a>
-          <a href="/app/admin/logs" class="gt-card gt-card-hover block p-4 mb-4">
+          <a href="/app/admin/logs" class="gt-card gt-card-hover block p-4 mb-3">
             <p class="font-medium">📜 Log Aktivitas</p>
             <p class="gt-muted text-sm">
               Seluruh aktivitas guru & admin: login, jadwal, jurnal, absensi,
               nilai, dan kelola data
+            </p>
+          </a>
+          <a href="/app/admin/backup" class="gt-card gt-card-hover block p-4 mb-4">
+            <p class="font-medium">💾 Backup & Restore</p>
+            <p class="gt-muted text-sm">
+              Unduh seluruh data dalam satu berkas JSON, atau pulihkan dari
+              backup
             </p>
           </a>
         </>

@@ -3,6 +3,7 @@ import { serveStatic } from "hono/bun";
 import { requireAdmin, requireAuth } from "./middleware/auth";
 import { requireStudentAuth } from "./middleware/student-auth";
 import { activityLogRoutes } from "./routes/activity-log.tsx";
+import { backupRoutes } from "./routes/backup.tsx";
 import { adminRoutes } from "./routes/admin.tsx";
 import { attendanceRoutes } from "./routes/attendance.tsx";
 import { attendanceReportRoutes } from "./routes/attendance-report.tsx";
@@ -52,6 +53,7 @@ app.route("/", resourcesRoutes);
 app.route("/", profileRoutes);
 app.route("/", adminRoutes);
 app.route("/", activityLogRoutes);
+app.route("/", backupRoutes);
 app.route("/", schoolRoutes);
 
 app.route("/", studentAuthRoutes);

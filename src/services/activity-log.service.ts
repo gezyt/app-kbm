@@ -52,6 +52,8 @@ export const ACTIVITY_ACTION_LABELS: Record<string, string> = {
   hapus_catatan_anekdot: "Hapus catatan anekdot",
   simpan_narasi_anekdot: "Simpan narasi anekdot",
   ekspor_rekap_absensi_csv: "Ekspor rekap absensi (CSV)",
+  backup_data: "Unduh backup",
+  restore_data: "Pulihkan backup",
 };
 
 export function activityActionLabel(action: string): string {
