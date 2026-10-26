@@ -5,44 +5,46 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* --------------------------------------------------------------------------
-   Tema & utilitas kustom: Glassmorphism + glow
+   Tema & utilitas kustom: identitas baru 2026-10-26 (indigo + Plus Jakarta
+   Sans, permukaan solid + bayangan lembut, bukan lagi glassmorphism/glow).
+   Nama class .gt-* dipertahankan supaya halaman lama tidak perlu diubah.
    Dipakai bersama utility Tailwind biasa. Bekerja untuk light & dark mode.
    -------------------------------------------------------------------------- */
 
 @layer base {
     :root {
         /* Surface dasar */
-        --gt-bg: 248 250 252; /* slate-50 */
+        --gt-bg: 246 247 251;
         --gt-surface: 255 255 255; /* white */
         --gt-surface-strong: 255 255 255;
-        --gt-border: 226 232 240; /* slate-200 */
-        --gt-border-soft: 241 245 249; /* slate-100 */
+        --gt-border: 229 231 235; /* slate-ish */
+        --gt-border-soft: 243 244 246;
         --gt-text: 15 23 42; /* slate-900 */
         --gt-text-muted: 100 116 139; /* slate-500 */
         --gt-text-subtle: 148 163 184; /* slate-400 */
-        --gt-accent: 4 120 87; /* emerald-700 */
-        --gt-accent-soft: 209 250 229; /* emerald-50 */
-        --gt-glow: 16 185 129; /* emerald-500 */
-        --gt-ring: 16 185 129; /* emerald-500 */
-        --gt-glass-alpha: 0.7;
+        --gt-accent: 79 70 229; /* indigo-600 */
+        --gt-accent-soft: 238 242 255; /* indigo-50 */
+        --gt-glow: 99 102 241; /* indigo-500 */
+        --gt-ring: 79 70 229; /* indigo-600 */
+        --gt-glass-alpha: 0.92;
         --gt-glass-blur: 12px;
     }
 
     .dark {
-        --gt-bg: 2 6 23; /* slate-950 */
-        --gt-surface: 15 23 42; /* slate-900 */
-        --gt-surface-strong: 15 23 42;
+        --gt-bg: 5 8 24;
+        --gt-surface: 17 24 39; /* gray-900 */
+        --gt-surface-strong: 17 24 39;
         --gt-border: 51 65 85; /* slate-700 */
         --gt-border-soft: 30 41 59; /* slate-800 */
         --gt-text: 241 245 249; /* slate-100 */
         --gt-text-muted: 148 163 184; /* slate-400 */
         --gt-text-subtle: 100 116 139; /* slate-500 */
-        --gt-accent: 52 211 153; /* emerald-400 */
-        --gt-accent-soft: 6 78 59; /* emerald-900 */
-        --gt-glow: 52 211 153; /* emerald-400 */
-        --gt-ring: 52 211 153; /* emerald-400 */
-        --gt-glass-alpha: 0.6;
-        --gt-glass-blur: 16px;
+        --gt-accent: 129 140 248; /* indigo-400 */
+        --gt-accent-soft: 30 27 75; /* indigo-950 */
+        --gt-glow: 129 140 248; /* indigo-400 */
+        --gt-ring: 129 140 248; /* indigo-400 */
+        --gt-glass-alpha: 0.9;
+        --gt-glass-blur: 12px;
     }
 
     html {
@@ -50,6 +52,8 @@
     }
 
     body {
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI",
+            Roboto, sans-serif;
         background-color: rgb(var(--gt-bg));
         color: rgb(var(--gt-text));
         transition:
@@ -85,20 +89,122 @@
             inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
     }
 
-    /* Card standar aplikasi */
+    /* Card standar aplikasi: permukaan solid + bayangan lembut. */
     .gt-card {
         background-color: rgb(var(--gt-surface));
         color: rgb(var(--gt-text));
-        border: 1px solid rgb(var(--gt-border));
-        border-radius: 1rem;
+        border: 1px solid rgb(var(--gt-border) / 0.7);
+        border-radius: 1.25rem;
+        box-shadow:
+            0 1px 2px rgba(15, 23, 42, 0.05),
+            0 8px 24px rgba(15, 23, 42, 0.04);
     }
     .dark .gt-card {
-        background-color: rgb(var(--gt-surface) / 0.7);
+        background-color: rgb(var(--gt-surface));
         color: rgb(var(--gt-text));
-        border: 1px solid rgb(var(--gt-border) / 0.6);
-        backdrop-filter: blur(12px) saturate(160%);
-        -webkit-backdrop-filter: blur(12px) saturate(160%);
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgb(255 255 255 / 0.08);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Identitas baru: logo, hero, sidebar, navigasi bawah, lencana. */
+    .gt-logo {
+        display: inline-flex;
+        width: 2.5rem;
+        height: 2.5rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.9rem;
+        color: #fff;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6 60%, #a855f7);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+        flex-shrink: 0;
+    }
+    .gt-logo-lg {
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: 1.1rem;
+    }
+    .gt-logo-lg svg {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+    .gt-hero {
+        border-radius: 1.5rem;
+        color: #fff;
+        background:
+            radial-gradient(120% 160% at 100% 0%, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0) 45%),
+            linear-gradient(135deg, #4f46e5, #7c3aed 60%, #9333ea);
+        box-shadow: 0 16px 32px rgba(79, 70, 229, 0.28);
+    }
+    .gt-topbar {
+        background-color: rgb(var(--gt-surface) / 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgb(var(--gt-border) / 0.7);
+    }
+    .gt-bottomnav {
+        background-color: rgb(var(--gt-surface) / 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgb(var(--gt-border) / 0.7);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .gt-sidebar {
+        background-color: rgb(var(--gt-surface));
+        border-right: 1px solid rgb(var(--gt-border) / 0.7);
+    }
+    .dark .gt-sidebar {
+        border-right-color: rgb(255 255 255 / 0.08);
+    }
+    .gt-icon-badge {
+        display: inline-flex;
+        width: 2.5rem;
+        height: 2.5rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.85rem;
+    }
+    .gt-icon-indigo { background: rgb(238 242 255); color: rgb(79 70 229); }
+    .gt-icon-violet { background: rgb(245 243 255); color: rgb(124 58 237); }
+    .gt-icon-emerald { background: rgb(236 253 245); color: rgb(4 120 87); }
+    .gt-icon-amber { background: rgb(255 251 235); color: rgb(180 83 9); }
+    .gt-icon-sky { background: rgb(240 249 255); color: rgb(2 132 199); }
+    .gt-icon-rose { background: rgb(255 241 242); color: rgb(190 18 60); }
+    .dark .gt-icon-indigo { background: rgb(99 102 241 / 0.18); color: rgb(165 180 252); }
+    .dark .gt-icon-violet { background: rgb(139 92 246 / 0.18); color: rgb(196 181 253); }
+    .dark .gt-icon-emerald { background: rgb(16 185 129 / 0.18); color: rgb(110 231 183); }
+    .dark .gt-icon-amber { background: rgb(245 158 11 / 0.18); color: rgb(252 211 77); }
+    .dark .gt-icon-sky { background: rgb(14 165 233 / 0.18); color: rgb(125 211 252); }
+    .dark .gt-icon-rose { background: rgb(244 63 94 / 0.18); color: rgb(253 164 175); }
+    .gt-time-badge {
+        display: inline-flex;
+        min-width: 3.4rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.65rem;
+        background: rgb(var(--gt-accent-soft));
+        color: rgb(var(--gt-accent));
+        padding: 0.4rem 0.55rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+    .gt-progress {
+        height: 0.5rem;
+        overflow: hidden;
+        border-radius: 9999px;
+        background: rgb(var(--gt-border-soft));
+    }
+    .gt-progress-bar {
+        height: 100%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    }
+    .gt-link-indigo {
+        color: rgb(var(--gt-accent));
+    }
+    .gt-link-indigo:hover {
+        text-decoration: underline;
     }
 
     /* Disclosure ringkas untuk form opsional di dalam card */
@@ -225,16 +331,16 @@
             transform 0.2s ease;
     }
     .gt-card-hover:hover {
-        border-color: rgb(var(--gt-glow) / 0.6);
+        border-color: rgb(var(--gt-glow) / 0.5);
         box-shadow:
-            0 0 0 1px rgb(var(--gt-glow) / 0.2),
-            0 8px 30px rgb(var(--gt-glow) / 0.12);
+            0 1px 2px rgba(15, 23, 42, 0.06),
+            0 12px 28px rgba(79, 70, 229, 0.12);
         transform: translateY(-1px);
     }
     .dark .gt-card-hover:hover {
         box-shadow:
-            0 0 0 1px rgb(var(--gt-glow) / 0.35),
-            0 8px 30px rgb(var(--gt-glow) / 0.18);
+            0 1px 2px rgba(0, 0, 0, 0.3),
+            0 12px 28px rgba(0, 0, 0, 0.35);
     }
 
     /* Header & navbar sticky dengan efek glass */
@@ -260,38 +366,38 @@
         border-top: 1px solid rgb(var(--gt-border) / 0.5);
     }
 
-    /* Tombol primary dengan glow emerald */
+    /* Tombol primary: gradasi indigo → violet, bayangan lembut. */
     .gt-btn-primary {
-        background-color: rgb(var(--gt-accent));
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
         color: white;
-        border-radius: 0.5rem;
-        font-weight: 500;
+        border-radius: 0.75rem;
+        font-weight: 600;
         transition:
-            background-color 0.2s ease,
             box-shadow 0.2s ease,
-            transform 0.1s ease;
+            transform 0.1s ease,
+            filter 0.2s ease;
     }
     .gt-btn-primary:hover {
-        background-color: rgb(var(--gt-accent) / 0.9);
-        box-shadow: 0 0 20px rgb(var(--gt-glow) / 0.4);
+        filter: brightness(1.06);
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
     }
     .gt-btn-primary:active {
         transform: scale(0.98);
     }
     .dark .gt-btn-primary {
-        background-color: rgb(var(--gt-accent) / 0.9);
-        color: rgb(2 6 23);
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
     }
     .dark .gt-btn-primary:hover {
-        background-color: rgb(var(--gt-accent));
-        box-shadow: 0 0 24px rgb(var(--gt-glow) / 0.5);
+        filter: brightness(1.08);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
     }
 
     /* Tombol danger (hapus massal, dll) */
     .gt-btn-danger {
         background-color: rgb(220 38 38);
         color: white;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         font-weight: 500;
         transition: background-color 0.2s ease;
     }
@@ -309,7 +415,7 @@
     .gt-btn-secondary {
         background-color: rgb(var(--gt-border-soft));
         color: rgb(var(--gt-text));
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         font-weight: 500;
         transition:
             background-color 0.2s ease,
@@ -322,7 +428,7 @@
     /* Input & select dengan focus glow */
     .gt-input {
         width: 100%;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         border: 1px solid rgb(var(--gt-border));
         background-color: rgb(var(--gt-surface));
         color: rgb(var(--gt-text));

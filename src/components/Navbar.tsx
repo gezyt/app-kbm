@@ -1,43 +1,45 @@
 import type { FC } from "hono/jsx";
 import type { SessionUser } from "../services/auth.service";
+import { Icon, NAV_ITEMS } from "./Brand";
 
-const NAV_ITEMS = [
-  { key: "dashboard", label: "Beranda", href: "/app", icon: "🏠" },
-  { key: "schedule", label: "Jadwal", href: "/app/schedule", icon: "🗓️" },
-  { key: "journal", label: "Jurnal", href: "/app/journal", icon: "📝" },
-  { key: "attendance", label: "Absensi", href: "/app/attendance", icon: "✅" },
-  { key: "students", label: "Siswa", href: "/app/students", icon: "🎓" },
-  { key: "scores", label: "Nilai", href: "/app/scores", icon: "📊" },
-  {
-    key: "resources",
-    label: "Perangkat",
-    href: "/app/resources",
-    icon: "📁",
-  },
-];
-
+/** Navigasi bawah untuk HP. Di desktop digantikan Sidebar. */
 export const Navbar: FC<{ active?: string; user: SessionUser }> = ({
   active,
   user,
 }) => {
+  const items = NAV_ITEMS.filter(
+    (item) => item.key !== "students" || user.role === "admin",
+  );
   return (
-    <nav class="gt-nav-glass fixed bottom-0 inset-x-0 z-10" hx-boost="true">
+    <nav class="gt-bottomnav fixed bottom-0 inset-x-0 z-20 lg:hidden" hx-boost="true">
       <ul class="flex overflow-x-auto no-scrollbar">
-        {NAV_ITEMS.filter(
-          (item) => item.key !== "students" || user.role === "admin",
-        ).map((item) => (
-          <li class="flex-1 min-w-16">
-            <a
-              href={item.href}
-              class={`flex flex-col items-center justify-center gap-0.5 py-2 text-[11px] transition-colors ${
-                active === item.key ? "gt-accent-text font-medium" : "gt-muted"
-              }`}
-            >
-              <span class="text-lg leading-none">{item.icon}</span>
-              {item.label}
-            </a>
-          </li>
-        ))}
+        {items.map((item) => {
+          const isActive = active === item.key;
+          return (
+            <li class="flex-1 min-w-16">
+              <a
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                class={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium transition-colors ${
+                  isActive
+                    ? "text-indigo-600 dark:text-indigo-300"
+                    : "text-slate-500 dark:text-slate-400"
+                }`}
+              >
+                <span
+                  class={`flex h-7 items-center justify-center rounded-full px-4 transition-colors ${
+                    isActive
+                      ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200"
+                      : ""
+                  }`}
+                >
+                  <Icon name={item.icon} class="h-5 w-5" />
+                </span>
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
