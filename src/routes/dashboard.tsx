@@ -40,6 +40,7 @@ const QUICK_ACTIONS: Array<{
   { href: "/app/scores", label: "Nilai", desc: "Input & rekap", icon: "chart", tone: "gt-icon-amber" },
   { href: "/app/students", label: "Data Siswa", desc: "Kelola per kelas", icon: "students", tone: "gt-icon-sky", adminOnly: true },
   { href: "/app/resources", label: "Perangkat", desc: "Tautan Drive KBM", icon: "folder", tone: "gt-icon-rose" },
+  { href: "/app/documents", label: "Dokumen", desc: "CP, ATP, RPP, LKPD, Asesmen", icon: "book", tone: "gt-icon-indigo" },
 ];
 
 dashboardRoutes.get("/app", async (c) => {

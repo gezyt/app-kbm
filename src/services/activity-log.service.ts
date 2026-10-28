@@ -46,6 +46,8 @@ export const ACTIVITY_ACTION_LABELS: Record<string, string> = {
   simpan_nilai: "Simpan nilai",
   buat_perangkat: "Tambah perangkat",
   hapus_perangkat: "Hapus perangkat",
+  buat_dokumen: "Unggah dokumen",
+  hapus_dokumen: "Hapus dokumen",
   ubah_password_sendiri: "Ubah password sendiri",
   buat_catatan_anekdot: "Tambah catatan anekdot",
   ubah_catatan_anekdot: "Ubah catatan anekdot",

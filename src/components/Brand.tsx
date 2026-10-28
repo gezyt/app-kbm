@@ -17,6 +17,7 @@ export const NAV_ITEMS = [
   { key: "students", label: "Siswa", href: "/app/students", icon: "students" },
   { key: "scores", label: "Nilai", href: "/app/scores", icon: "chart" },
   { key: "resources", label: "Perangkat", href: "/app/resources", icon: "folder" },
+  { key: "documents", label: "Dokumen", href: "/app/documents", icon: "book" },
 ] as const;
 
 export type IconName =

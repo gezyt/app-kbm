@@ -264,6 +264,39 @@ export const resources = sqliteTable("resources", {
   ...timestamps,
 });
 
+/**
+ * Dokumen guru (app-kbm, v1).
+ * Berbeda dengan `resources` (tautan Google Drive): dokumen di sini adalah
+ * BERKAS yang diunggah ke server dan disimpan di `data/uploads/documents/`.
+ * Hanya metadata yang masuk database; isi berkas TIDAK masuk backup JSON
+ * (lihat backup.service.ts) sehingga saat pindah server folder unggahan
+ * harus disalin terpisah.
+ * Kategori mengikuti permintaan Pak Gun: CP, ATP, RPP, LKPD, Asesmen, Lainnya.
+ */
+export const documents = sqliteTable(
+  "documents",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    category: text("category", {
+      enum: ["CP", "ATP", "RPP", "LKPD", "Asesmen", "Lainnya"],
+    }).notNull(),
+    title: text("title").notNull(),
+    subject: text("subject"),
+    grade: text("grade"),
+    semester: text("semester"),
+    description: text("description"),
+    fileName: text("file_name").notNull(),
+    storedFileName: text("stored_file_name").notNull().unique(),
+    fileSize: integer("file_size").notNull(),
+    mimeType: text("mime_type").notNull(),
+    ...timestamps,
+  },
+  (table) => [index("documents_user_category_idx").on(table.userId, table.category)],
+);
+
 /** Nilai visi sekolah. Dapat dikelola admin, dengan enam nilai awal dari seed. */
 export const visionValues = sqliteTable("vision_values", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -325,6 +358,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   createdClasses: many(classes),
   schedules: many(schedules),
   resources: many(resources),
+  documents: many(documents),
   anecdotalRecords: many(anecdotalRecords),
   sessions: many(sessions),
 }));
@@ -415,6 +449,10 @@ export const attendanceRelations = relations(attendance, ({ one }) => ({
 
 export const resourcesRelations = relations(resources, ({ one }) => ({
   user: one(users, { fields: [resources.userId], references: [users.id] }),
+}));
+
+export const documentsRelations = relations(documents, ({ one }) => ({
+  user: one(users, { fields: [documents.userId], references: [users.id] }),
 }));
 
 export const visionValuesRelations = relations(visionValues, ({ many }) => ({

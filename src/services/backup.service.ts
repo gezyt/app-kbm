@@ -9,6 +9,7 @@ import {
   assessmentPlans,
   attendance,
   classes,
+  documents,
   journals,
   resources,
   schedules,
@@ -42,8 +43,11 @@ import {
  * sandi aslinya, tapi tetap sensitif). Halaman backup memperingatkan admin
  * agar menyimpannya di tempat aman dan tidak membagikannya.
  *
- * GezyTeach tidak punya folder unggahan (perangkat KBM hanya berupa tautan),
- * jadi JSON ini sudah mencakup seluruh data aplikasi.
+ * PENGECUALIAN sejak modul Dokumen (app-kbm): JSON ini mencakup metadata
+ * dokumen (judul, kategori, nama berkas), tetapi TIDAK mencakup isi
+ * berkasnya. Berkas ada di `data/uploads/documents/` dan harus disalin
+ * terpisah saat pindah server, kalau tidak unduhan dokumen hasil restore
+ * akan 404.
  */
 
 export const BACKUP_APP = "gezyteach-backup";
@@ -61,6 +65,7 @@ const BACKUP_TABLES = [
   { key: "scores", table: scores },
   { key: "attendance", table: attendance },
   { key: "resources", table: resources },
+  { key: "documents", table: documents },
   { key: "vision_values", table: visionValues },
   { key: "anecdotal_records", table: anecdotalRecords },
   { key: "anecdotal_record_values", table: anecdotalRecordValues },
@@ -86,6 +91,7 @@ const DELETE_ORDER: BackupTableKey[] = [
   "schedules",
   "students",
   "resources",
+  "documents",
   "activity_logs",
   "classes",
   "vision_values",
@@ -109,6 +115,7 @@ const INSERT_ORDER: BackupTableKey[] = [
   "scores",
   "attendance",
   "resources",
+  "documents",
   "anecdotal_record_values",
   "anecdotal_semester_summaries",
   "activity_logs",
@@ -307,6 +314,7 @@ export const BACKUP_TABLE_LABELS: Record<string, string> = {
   scores: "Nilai",
   attendance: "Absensi",
   resources: "Perangkat",
+  documents: "Dokumen",
   vision_values: "Nilai visi",
   anecdotal_records: "Catatan anekdot",
   anecdotal_record_values: "Nilai visi catatan",
